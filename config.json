@@ -1,8 +1,11 @@
 {
     "nick":"chonebot",
     "realname":"#linux-cn opbot",
-    "host":"irc.freenode.net",
-    "port":6697,
+    "server":{
+        "host":"irc.freenode.net",
+        "port":6697,
+        "ssl":true
+    },
     "channel":"#linux-cn",
     "key":false
 }

@@ -11,21 +11,13 @@ from botevent import e
 def main(config):
     log = getLogger('botlord')
     log.setLevel('DEBUG')
-
-    # Add the log message handler to the logger
     handler = handlers.RotatingFileHandler(filename='botlord.log')
-
     log.addHandler(handler)
-
 
     loop = asyncio.get_event_loop()
     coro = loop.create_connection(
         (lambda: IRCProtocol(config, loop, e, log)),
-        **{
-            'host':"irc.freenode.net",
-            'port':6697,
-            'ssl':True
-        }
+        **config['server']
     )
 
     loop.run_until_complete(coro)

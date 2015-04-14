@@ -3,7 +3,7 @@ from ircaio import Events
 e = Events()
 
 @e.on('MADE')
-def login(bot, message):
+def login(bot, kwargs):
     bot.send('NICK', nick=bot.nick)
     if bool(bot.password):
         bot.log.debug('PASSWORD {}'.format('*'*len(bot.password)))
@@ -13,12 +13,12 @@ def login(bot, message):
     bot.send('JOIN', channel=bot.channel)
 
 @e.on('PING')
-def keepalive(bot, message):
-    bot.log.info(message)
-    bot.send('PONG', message=message)
+def keepalive(bot, kwargs):
+    bot.log.info(kwargs.message)
+    bot.send('PONG', message=kwargs.message)
 
 @e.on('PRIVMSG')
-def privmsg(bot, user, host, nick, target, message):
-    bot.log.debug('{}, {}, {}'.format(nick, target, message))
-    if nick != bot.nick and nick != target:
-       bot.send('PRIVMSG', target=target, message='{}: {}'.format(nick, message))
+def privmsg(bot, kwargs):
+    bot.log.debug('{}'.format(kwargs))
+    if kwargs.nick != bot.nick and kwargs.nick != kwargs.target:
+       bot.send('PRIVMSG', target=kwargs.target, message='{}: {}'.format(kwargs.nick, kwargs.message))

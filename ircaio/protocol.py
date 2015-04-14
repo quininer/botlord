@@ -1,6 +1,7 @@
 from asyncio import Protocol, async, wait
 from .pack import pack_command
 from .unpack import unpack_command
+from .attrdict import AttrDict
 from functools import partial
 
 class IRCProtocol(Protocol):
@@ -54,7 +55,7 @@ class IRCProtocol(Protocol):
         for e in args:
             if not e in self.event.__events__:
                 continue
-            fns = [partial(i, self)(**args[e]) for i in self.event.__events__[e]]
+            fns = [partial(i, self)(AttrDict(args[e])) for i in self.event.__events__[e]]
 
             self.log.debug('{}: {!r}'.format(self.event.__events__[e], args[e]))
             if self.log.level <= 10:
@@ -97,8 +98,8 @@ class IRCProtocol(Protocol):
         '''
         data received event.
         >>> @event.on('DATA')
-        ... def data(bot, message):
-        ...     bot.send('PRIVMSG', message=message)
+        ... def data(bot, kwargs):
+        ...     bot.log.debug(kwargs.message)
         '''
         data = data.decode('utf-8')
         self.log.debug('[received] {}'.format(data))
