@@ -1,20 +1,41 @@
 from functools import partial
 from asyncio import coroutine, iscoroutine, wait
 
+from .protocol import IRCProtocol
+
 class Events(object):
 
-    __partials__ = {}
+    __events__ = {}
 
     def __add_event__(self, event:str, fn):
-        self.__partials__[event].append(fn if iscoroutine(fn) else coroutine(fn))
+        self.__events__[event].append(fn if iscoroutine(fn) else coroutine(fn))
 
     def on(self, event:str):
+        '''
+        >>> @event.on('PRIVMSG')
+        ... def privmsg(bot, nick, target, message):
+        ...     if nick != bot.nick and nick != target:
+        ...        bot.send('PRIVMSG', target=target, message='{}: {}'.format(nick, message))
+        '''
         def hook(fn):
             self.__add_event__(event, fn)
         return hook
 
     @coroutine
-    def trigger(self, event, **kwargs):
-        fns = [partial(fn, self.irc)(**kwargs) for fn in self.__partials__[event]]
+    def trigger(self, protocol:IRCProtocol, event:str, **kwargs):
+        '''
+        >>> yield from event.trigger(bot, 'PRIVMSG',
+        ...     target="#linux-cn",
+        ...     nick="quininer",
+        ...     message="Hello world."
+        ... )
+        '''
+        fns = [partial(fn, protocol)(**kwargs) for fn in self.__events__[event]]
+
+        protocol.log.info('trigger', self.__events__[event], kwargs)
+        if protocol.log.level <= 10:
+            for fn in fns:
+                protocol.log.debug('trigger', fn)
+
         if bool(fns):
             yield from wait(fns)

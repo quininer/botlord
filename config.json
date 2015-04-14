@@ -3,10 +3,6 @@
     "realname":"#linux-cn opbot",
     "host":"irc.freenode.net",
     "port":6697,
-    "channel":[
-        "#linux-cn"
-    ],
-    "key":[
-        false
-    ]
+    "channel":"#linux-cn",
+    "key":false
 }
