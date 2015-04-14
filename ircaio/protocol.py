@@ -104,8 +104,7 @@ class IRCProtocol(Protocol):
         self.log.debug('[received] {}'.format(data))
         for l in data.split('\r\n'):
             if bool(l.strip()):
-                continue
-            self.handle('DATA', l)
+                self.handle('DATA', l)
 
     def connection_lost(self, exc):
         '''
