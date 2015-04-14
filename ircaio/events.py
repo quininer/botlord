@@ -36,9 +36,6 @@ class Events(object):
         fns = [partial(fn, protocol)(AttrDict(kwargs)) for fn in self.__events__[event]]
 
         protocol.log.info('trigger', self.__events__[event], kwargs)
-        if protocol.log.level <= 10:
-            for fn in fns:
-                protocol.log.debug('trigger', fn)
 
         if bool(fns):
             yield from wait(fns)

@@ -29,6 +29,9 @@ class IRCProtocol(Protocol):
         self.realname = config['realname'] if 'realname' in config else "#linux-cn opbot."
         self.channel = config['channel']
         self.key = config['key'] if 'key' in config else None
+        self.master = config['master'] if 'master' in config else None
+        self.operator = config['operator'] if 'operator' in config else []
+        self.debug = config['debug'] if 'debug' in config else False
 
         self.loop = loop
         self.event = event
@@ -52,15 +55,12 @@ class IRCProtocol(Protocol):
         self.__event_handle__(args)
 
     def __event_handle__(self, args:dict):
-        for e in args:
-            if not e in self.event.__events__:
+        for event in args:
+            if not event in self.event.__events__:
                 continue
-            fns = [partial(i, self)(AttrDict(args[e])) for i in self.event.__events__[e]]
+            fns = [partial(e, self)(AttrDict(args[event])) for e in self.event.__events__[event]]
 
-            self.log.debug('{}: {!r}'.format(self.event.__events__[e], args[e]))
-            if self.log.level <= 10:
-                for fn in fns:
-                    self.log.debug(fn)
+            self.log.debug('{}: {!r}'.format(self.event.__events__[event], args[event]))
 
 #           NOTE asyncio task
             if bool(fns):

@@ -5,13 +5,16 @@ import asyncio
 from ircaio import IRCProtocol
 from logging import getLogger, handlers
 from json import loads
+from argparse import ArgumentParser
 
-from botevent import e
+from actions import e
 
-def main(config):
-    log = getLogger('botlord')
-    log.setLevel('DEBUG')
-    handler = handlers.RotatingFileHandler(filename='botlord.log')
+def main(config, logpath=None):
+    log = getLogger(config['nick'])
+    log.setLevel('DEBUG' if config['debug'] else 'INFO')
+    handler = handlers.RotatingFileHandler(
+        filename=(logpath or '{}.log'.format(config['nick']))
+    )
     log.addHandler(handler)
 
     loop = asyncio.get_event_loop()
@@ -25,6 +28,11 @@ def main(config):
     loop.close()
 
 if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument('-c', '--config', help="config path.")
+    parser.add_argument('-l', '--log', help="log path.")
+    args = parser.parse_args()
+
     main(loads(
-        open('./xconfig.json', 'r').read()
-    ))
+        open(args.config or './config.json', 'r').read()
+    ), args.log)
