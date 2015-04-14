@@ -1,14 +1,10 @@
-from asyncio import async, wait
+from asyncio import Protocol, async, wait
 from .pack import pack_command
 from .unpack import unpack_command
 from functools import partial
 
-from .event import Events
-from logging import RootLogger
-from asyncio import BaseEventLoop, Protocol, Transport
-
 class IRCProtocol(Protocol):
-    def __init__(self, config:dict, loop:BaseEventLoop, event:Events, log:RootLogger):
+    def __init__(self, config:dict, loop, event, log):
         '''
         >>> from events import events
         >>> log = logging.getLogger(__name__)
@@ -42,12 +38,12 @@ class IRCProtocol(Protocol):
         args = {
             event: {'message':message}
         }
-        self.log.debug(event, message)
+        self.log.debug('{}: {!r}'.format(event, message))
 
         if event == 'DATA' and bool(message):
             try:
                 (command, kwargs) = unpack_command(message)
-                self.log.info(command, kwargs)
+                self.log.info('{}: {!r}'.format(command, kwargs))
                 args[command] = kwargs
             except ValueError as err:
                 self.log.error(err)
@@ -56,9 +52,11 @@ class IRCProtocol(Protocol):
 
     def __event_handle__(self, args:dict):
         for e in args:
+            if not e in self.event.__events__:
+                continue
             fns = [partial(i, self)(**args[e]) for i in self.event.__events__[e]]
 
-            self.log.debug(self.event.__events__[e], args[e])
+            self.log.debug('{}: {!r}'.format(self.event.__events__[e], args[e]))
             if self.log.level <= 10:
                 for fn in fns:
                     self.log.debug(fn)
@@ -67,7 +65,7 @@ class IRCProtocol(Protocol):
             if bool(fns):
                 async(wait(fns))
 
-    def connection_made(self, transport:Transport):
+    def connection_made(self, transport):
         '''
         connection made event.
         >>> @event.on('MADE')
@@ -82,6 +80,7 @@ class IRCProtocol(Protocol):
         '''
         >>> bot.write("Hello world.")
         '''
+        self.log.debug('[senddata] {}'.format(data))
         data = '{}\r\n'.format(data).encode()
         self.transport.write(data)
 
@@ -102,6 +101,7 @@ class IRCProtocol(Protocol):
         ...     bot.send('PRIVMSG', message=message)
         '''
         data = data.decode('utf-8')
+        self.log.debug('[received] {}'.format(data))
         for l in data.split('\r\n'):
             if bool(l.strip()):
                 continue

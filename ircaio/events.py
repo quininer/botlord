@@ -1,13 +1,13 @@
 from functools import partial
 from asyncio import coroutine, iscoroutine, wait
 
-from .protocol import IRCProtocol
-
 class Events(object):
 
     __events__ = {}
 
     def __add_event__(self, event:str, fn):
+        if not event in self.__events__:
+            self.__events__[event] = []
         self.__events__[event].append(fn if iscoroutine(fn) else coroutine(fn))
 
     def on(self, event:str):
@@ -22,7 +22,7 @@ class Events(object):
         return hook
 
     @coroutine
-    def trigger(self, protocol:IRCProtocol, event:str, **kwargs):
+    def trigger(self, protocol, event:str, **kwargs):
         '''
         >>> yield from event.trigger(bot, 'PRIVMSG',
         ...     target="#linux-cn",
@@ -30,6 +30,8 @@ class Events(object):
         ...     message="Hello world."
         ... )
         '''
+        if not event in self.event.__events__:
+            return
         fns = [partial(fn, protocol)(**kwargs) for fn in self.__events__[event]]
 
         protocol.log.info('trigger', self.__events__[event], kwargs)

@@ -2,16 +2,25 @@
 # encoding: utf-8
 
 import asyncio
-from ircaio import IRCProtocol, Events
-import logging
+from ircaio import IRCProtocol
+from logging import getLogger, handlers
+from json import loads
 
-def main():
-    log = logging.getLogger(__name__)
-    event = Events()
+from botevent import e
+
+def main(config):
+    log = getLogger('botlord')
+    log.setLevel('DEBUG')
+
+    # Add the log message handler to the logger
+    handler = handlers.RotatingFileHandler(filename='botlord.log')
+
+    log.addHandler(handler)
+
+
     loop = asyncio.get_event_loop()
-    #XXX
     coro = loop.create_connection(
-        (lambda: IRCProtocol(loop, event, log)),
+        (lambda: IRCProtocol(config, loop, e, log)),
         **{
             'host':"irc.freenode.net",
             'port':6697,
@@ -24,4 +33,6 @@ def main():
     loop.close()
 
 if __name__ == '__main__':
-    pass
+    main(loads(
+        open('./xconfig.json', 'r').read()
+    ))
