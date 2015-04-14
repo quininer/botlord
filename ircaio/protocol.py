@@ -14,21 +14,25 @@ class IRCProtocol(Protocol):
 
     def handle(self, event:str, message:str=None):
         event = event.upper()
-        self.log.debug(event, msg)
+        self.log.debug(event, message)
+        args = {
+            event: {'message':message}
+        }
         if event == 'DATA' and bool(msg):
             try:
                 (command, kwargs) = unpack_command(message)
+                self.log.info(command, kwargs)
+                args[command] = kwargs
             except ValueError as err:
                 self.log.error(err)
-        self.__event_handle__({
-            event: message,
-            command: kwargs
-        })
+
+        self.__event_handle__(args)
 
     def __event_handle__(self, args:dict):
         for e in args:
             for i in self.event.__partials__[e]:
-                partial(i, self)(args[e])
+                asyncio.async(partial(partial(i, self), **args[e])())
+#               asyncio task
 
     def connection_made(self, transport:Transport):
         self.transport = transport

@@ -9,7 +9,7 @@ def main():
     log = logging.getLogger(__name__)
     event = Events()
     loop = asyncio.get_event_loop()
-
+    #XXX
     coro = loop.create_connection(
         (lambda: IRCProtocol(loop, event, log)),
         **{
