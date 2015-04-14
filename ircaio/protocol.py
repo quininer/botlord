@@ -1,10 +1,11 @@
-from asyncio import Protocol, Transport
+from asyncio import async
 from .pack import pack_command
 from .unpack import unpack_command
 from functools import partial
 
 from .event import Events
 from logging import RootLogger
+from asyncio import Protocol, Transport
 
 class IRCProtocol(Protocol):
     def __init__(self, loop, event:Events, log:RootLogger):
@@ -14,11 +15,12 @@ class IRCProtocol(Protocol):
 
     def handle(self, event:str, message:str=None):
         event = event.upper()
-        self.log.debug(event, message)
         args = {
             event: {'message':message}
         }
-        if event == 'DATA' and bool(msg):
+        self.log.debug(event, message)
+
+        if event == 'DATA' and bool(message):
             try:
                 (command, kwargs) = unpack_command(message)
                 self.log.info(command, kwargs)
@@ -31,8 +33,9 @@ class IRCProtocol(Protocol):
     def __event_handle__(self, args:dict):
         for e in args:
             for i in self.event.__partials__[e]:
-                asyncio.async(partial(partial(i, self), **args[e])())
-#               asyncio task
+                self.log.debug(i, args[e])
+#               NOTE asyncio task
+                async(partial(partial(i, self), **args[e])())
 
     def connection_made(self, transport:Transport):
         self.transport = transport
