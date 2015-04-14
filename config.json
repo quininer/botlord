@@ -7,5 +7,9 @@
         "ssl":true
     },
     "channel":"#linux-cn",
-    "key":false
+    "key":false,
+    "master":[
+        "unaffiliated/quininer"
+    ],
+    "operator":[]
 }
