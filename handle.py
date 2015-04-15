@@ -30,7 +30,13 @@ def PART(bot, kwargs):
 
 @e.on('PRIVMSG')
 def PRIVMSG(bot, kwargs):
-    yield from wait([m.privmsg(kwargs) for m in bot.modules])
+    em = [m.privmsg(kwargs) for m in bot.modules]
+    message = kwargs.message.split(' ', 2)
+    if message[0][:-1] == bot.nick:
+        kwargs['command'] = message[1] if len(message) > 1 else None
+        kwargs['args'] = message[2] if len(message) > 2 else None
+        em += [m.command(kwargs) for m in bot.modules]
+    yield from wait(em)
 
 @e.on('NOTICE')
 def NOTICE(bot, kwargs):

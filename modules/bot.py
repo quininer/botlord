@@ -30,15 +30,22 @@ class main(module):
 
     @asyncio.coroutine
     def command(self, kwargs):
-        message = kwargs.message.split(' ', 1)
-        [cmd, args] = message if len(message) > 1 else message.append(None)
-        yield from self.commands[cmd](self, args, kwargs)
+        if not kwargs.command in self.commands:
+            return
+        self.log.debug(kwargs)
+        yield from self.commands[kwargs.command](kwargs)
 
     @asyncio.coroutine
-    def __quit(self, args, kwargs):
+    def __quit(self, kwargs):
         if kwargs.host == self.bot.master:
-            self.send('QUIT', message=args)
+            self.send('QUIT', message=kwargs.args)
+        else:
+            self.send('PRIVMSG', target=kwargs.nick, message='You are not my master, without permission to do so. Maybe you need to log in?')
 
     @asyncio.coroutine
-    def __reload(self, args, kwargs):
-        pass
+    def __reload(self, kwargs):
+        if kwargs.host == self.bot.master:
+            self.bot.load_modules()
+        else:
+            self.send('PRIVMSG', target=kwargs.nick, message='You are not my master, without permission to do so. Maybe you need to log in?')
+

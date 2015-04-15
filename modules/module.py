@@ -1,24 +1,32 @@
+from asyncio import coroutine
+
 class module(object):
     def __init__(self, bot):
         self.bot = bot
         self.send = bot.send
         self.log = bot.log
 
+    @coroutine
     def made(self):
         pass
 
+    @coroutine
     def lost(self):
         pass
 
+    @coroutine
     def data(self):
         pass
 
+    @coroutine
     def privmsg(self, kwargs):
         pass
 
+    @coroutine
     def notice(self, kwargs):
         pass
 
+    @coroutine
     def command(self, kwargs):
         '''
         /msg #linux-cn :botlord: <command>
@@ -26,50 +34,66 @@ class module(object):
         '''
         pass
 
+    @coroutine
     def join(self, kwargs):
         pass
 
+    @coroutine
     def part(self, kwargs):
         pass
 
+    @coroutine
     def quit(self, kwargs):
         pass
 
+    @coroutine
     def rpl_welcome(self, kwargs):
         pass
 
+    @coroutine
     def rpl_yourhost(self, kwargs):
         pass
 
+    @coroutine
     def rpl_created(self, kwargs):
         pass
 
+    @coroutine
     def rpl_myinfo(self, kwargs):
         pass
 
+    @coroutine
     def rpl_bounce(self, kwargs):
         pass
 
+    @coroutine
     def rpl_motdstart(self, kwargs):
         pass
 
+    @coroutine
     def rpl_motd(self, kwargs):
         pass
 
+    @coroutine
     def rpl_endofmotd(self, kwargs):
         pass
 
+    @coroutine
     def rpl_luserclitent(self, kwargs):
         pass
 
+    @coroutine
     def rpl_luserme(self, kwargs):
         pass
 
+    @coroutine
     def rpl_luserop(self, kwargs):
         pass
 
+    @coroutine
     def rpl_luserunknown(self, kwargs):
         pass
 
+    @coroutine
     def rpl_luserchannels(self, kwargs):
         pass
