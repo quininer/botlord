@@ -1,6 +1,8 @@
 from asyncio import coroutine
 
 class module(object):
+    commands = {}
+
     def __init__(self, bot):
         self.bot = bot
         self.send = bot.send
@@ -29,10 +31,28 @@ class module(object):
     @coroutine
     def command(self, kwargs):
         '''
-        /msg #linux-cn :botlord: <command>
-        /msg botlord :<command>
+        Trigger:
+            /msg #linux-cn botlord: <command>
+            /msg botlord <command>
+
+        kwargs = {
+            'user': <target user>,
+            'host': <target mask>,
+            'nick': <target nick>,
+            'target': <channel or bot nick>,
+            'message': <message>,
+            'command': <command name>,
+            'argument': <command argument>
+        }
+
+        self.commands = {
+            '<command name>':<command coroutine function>
+        }
         '''
-        pass
+        if not kwargs.command in self.commands:
+            return
+        self.log.debug(kwargs)
+        yield from self.commands[kwargs.command](kwargs)
 
     @coroutine
     def join(self, kwargs):
