@@ -38,14 +38,15 @@ class main(module):
     @asyncio.coroutine
     def __quit(self, kwargs):
         if kwargs.host == self.bot.master:
-            self.send('QUIT', message=kwargs.args)
+            self.send('QUIT', message=kwargs.argument or "")
         else:
-            self.send('PRIVMSG', target=kwargs.nick, message='You are not my master, without permission to do so. Maybe you need to log in?')
+            self.send('PRIVMSG', target=kwargs.nick, message="You have no permission to do so since you 're not my master, maybe you need to log in first?")
 
     @asyncio.coroutine
     def __reload(self, kwargs):
         if kwargs.host == self.bot.master:
-            self.bot.load_modules()
+            self.bot.load_modules(re=True)
+            self.send('PRIVMSG', target=kwargs.nick, message="Module has been reloaded.")
         else:
-            self.send('PRIVMSG', target=kwargs.nick, message='You are not my master, without permission to do so. Maybe you need to log in?')
+            self.send('PRIVMSG', target=kwargs.nick, message="You have no permission to do so since you 're not my master, maybe you need to log in first?")
 

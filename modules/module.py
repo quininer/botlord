@@ -15,7 +15,7 @@ class module(object):
         pass
 
     @coroutine
-    def data(self):
+    def data(self, kwargs):
         pass
 
     @coroutine
