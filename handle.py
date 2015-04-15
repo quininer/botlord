@@ -1,27 +1,91 @@
 from ircaio import Events
-import asyncio
 
 e = Events()
 
 @e.on('MADE')
-def connected(bot, kwargs):
-    bot.send('NICK', nick=bot.nick)
-    if bool(bot.password):
-        bot.log.debug('PASSWORD {}'.format('*'*len(bot.password)))
-        bot.send('PASS', password=bot.password)
-    if bool(bot.realname):
-        bot.send('USER', user=bot.nick, realname=bot.realname)
-    bot.send('JOIN', channel=bot.channel)
+def MADE(bot, kwargs):
+    pass
+
+@e.on('LOST')
+def LOST(bot, kwargs):
+    pass
+
+@e.on('DATA')
+def DATA(bot, kwargs):
+    pass
 
 @e.on('PING')
-def keepalive(bot, kwargs):
-    bot.log.info(kwargs.message)
-    bot.send('PONG', message=kwargs.message)
+def PING(bot, kwargs):
+    pass
+
+@e.on('JOIN')
+def JOIN(bot, kwargs):
+    pass
+
+@e.on('PART')
+def PART(bot, kwargs):
+    pass
 
 @e.on('PRIVMSG')
-def privmsg(bot, kwargs):
-    bot.log.debug('{}'.format(kwargs))
-    if kwargs.nick != bot.nick and kwargs.nick != kwargs.target and kwargs.message.startswith(bot.nick):
-        msg = kwargs.message.split(' ', 1)[-1]
-        yield from asyncio.sleep(len(msg))
-        bot.send('PRIVMSG', target=kwargs.target, message='{}: {}'.format(kwargs.nick, msg))
+def PRIVMSG(bot, kwargs):
+    pass
+
+@e.on('NOTICE')
+def NOTICE(bot, kwargs):
+    pass
+
+@e.on('QUIT')
+def QUIT(bot, kwargs):
+    pass
+
+@e.on('RPL_WELCOME')
+def RPL_WELCOME(bot, kwargs):
+    pass
+
+@e.on('RPL_YOURHOST')
+def RPL_YOURHOST(bot, kwargs):
+    pass
+
+@e.on('RPL_CREATED')
+def RPL_CREATED(bot, kwargs):
+    pass
+
+@e.on('RPL_MYINFO')
+def RPL_MYINFO(bot, kwargs):
+    pass
+
+@e.on('RPL_BOUNCE')
+def RPL_BOUNCE(bot, kwargs):
+    pass
+
+@e.on('RPL_MOTDSTART')
+def RPL_MOTDSTART(bot, kwargs):
+    pass
+
+@e.on('RPL_MOTD')
+def RPL_MOTD(bot, kwargs):
+    pass
+
+@e.on('RPL_ENDOFMOTD')
+def RPL_ENDOFMOTD(bot, kwargs):
+    pass
+
+@e.on('RPL_LUSERCLIENT')
+def RPL_LUSERCLIENT(bot, kwargs):
+    pass
+
+@e.on('RPL_LUSERME')
+def RPL_LUSERME(bot, kwargs):
+    pass
+
+@e.on('RPL_LUSEROP')
+def RPL_LUSEROP(bot, kwargs):
+    pass
+
+@e.on('RPL_LUSERUNKNOWN')
+def RPL_LUSERUNKNOWN(bot, kwargs):
+    pass
+
+@e.on('RPL_LUSERCHANNELS')
+def RPL_LUSERCHANNELS(bot, kwargs):
+    pass
