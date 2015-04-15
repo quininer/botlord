@@ -8,7 +8,9 @@ class main(module):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.commands = {
-            'get':self.__get
+            'get':self.__get,
+            'enable':self.__enable,
+            'disable':self.__disable
         }
 
     @asyncio.coroutine
@@ -32,6 +34,16 @@ class main(module):
                 yield from self.__warning(kwargs, 'nomaster')
         else:
             yield from self.__warning(kwargs, 'unknown')
+
+    @asyncio.coroutine
+    def __enable(self):
+        modes = {}
+        pass
+
+    @asyncio.coroutine
+    def __disable(self):
+        modes = {}
+        pass
 
     @asyncio.coroutine
     def __warning(self, kwargs, warning):
