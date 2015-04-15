@@ -7,7 +7,7 @@ from logging import getLogger, handlers
 from json import loads
 from argparse import ArgumentParser
 
-from actions import e
+from handle import e
 
 def main(config, logpath=None):
     log = getLogger(config['nick'])

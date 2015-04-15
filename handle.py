@@ -4,7 +4,7 @@ import asyncio
 e = Events()
 
 @e.on('MADE')
-def login(bot, kwargs):
+def connected(bot, kwargs):
     bot.send('NICK', nick=bot.nick)
     if bool(bot.password):
         bot.log.debug('PASSWORD {}'.format('*'*len(bot.password)))

@@ -1,0 +1,2 @@
+class module(object):
+    pass

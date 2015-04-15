@@ -30,7 +30,6 @@ class IRCProtocol(Protocol):
         self.channel = config['channel']
         self.key = config['key'] if 'key' in config else None
         self.master = config['master'] if 'master' in config else None
-        self.operator = config['operator'] if 'operator' in config else []
         self.debug = config['debug'] if 'debug' in config else False
 
         self.loop = loop
@@ -47,7 +46,7 @@ class IRCProtocol(Protocol):
         if event == 'DATA' and bool(message):
             try:
                 (command, kwargs) = unpack_command(message)
-                self.log.info('{}: {!r}'.format(command, kwargs))
+                self.log.debug('{}: {!r}'.format(command, kwargs))
                 args[command] = kwargs
             except ValueError as err:
                 self.log.error(err)
@@ -55,16 +54,17 @@ class IRCProtocol(Protocol):
         self.__event_handle__(args)
 
     def __event_handle__(self, args:dict):
+        fns = []
         for event in args:
             if not event in self.event.__events__:
                 continue
-            fns = [partial(e, self)(AttrDict(args[event])) for e in self.event.__events__[event]]
+            fns += [partial(e, self)(AttrDict(args[event])) for e in self.event.__events__[event]]
 
             self.log.debug('{}: {!r}'.format(self.event.__events__[event], args[event]))
 
-#           NOTE asyncio task
-            if bool(fns):
-                async(wait(fns))
+#       NOTE asyncio task
+        if bool(fns):
+            async(wait(fns))
 
     def connection_made(self, transport):
         '''
@@ -81,7 +81,7 @@ class IRCProtocol(Protocol):
         '''
         >>> bot.write("Hello world.")
         '''
-        self.log.debug('[senddata] {}'.format(data))
+        self.log.info('[senddata] {}'.format(data))
         data = '{}\r\n'.format(data).encode()
         self.transport.write(data)
 
@@ -102,7 +102,7 @@ class IRCProtocol(Protocol):
         ...     bot.log.debug(kwargs.message)
         '''
         data = data.decode('utf-8')
-        self.log.debug('[received] {}'.format(data))
+        self.log.info('[received] {}'.format(data))
         for l in data.split('\r\n'):
             if bool(l.strip()):
                 self.handle('DATA', l)
