@@ -136,3 +136,4 @@ class IRCProtocol(Protocol):
                 if (isfile(join('modules', x)) and (not x in ['__init__.py', 'module.py'] and (not x.startswith('.'))))
             )
         ]
+        self.log.debug(self.modules)

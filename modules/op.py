@@ -9,6 +9,7 @@ class main(module):
         super().__init__(*args, **kwargs)
         self.commands = {
             'get':self.__get,
+            'drop':self.__drop,
             'enable':self.__enable,
             'disable':self.__disable
         }
@@ -16,34 +17,58 @@ class main(module):
     @asyncio.coroutine
     def join(self, kwargs):
         if kwargs.nick == self.bot.nick:
-            self.send('CHANNELMODE', channel=kwargs.channel, modes='+o')
+            self.send('PRIVMSG', target='ChanServ', message='op {}'.format(self.bot.channel))
 
     @asyncio.coroutine
-    def __get(self, kwargs):
-        modes = {
-            'op':"+o",
-            'voice':"+v"
-        }
+    def __getdrop(self, kwargs, modes):
         args = kwargs.argument.split(' ')
+        self.log.debug('{}, {}'.format(kwargs.argument, modes))
         if args[0].lower() == 'me':
             args[0] = kwargs.nick
         if len(args) == 2 and args[1] in modes:
             if kwargs.host == self.bot.master:
-                self.send('CHANNELMODE', channel=self.bot.channel, modes=modes[args[1]], params=args[0])
+                self.send('CHANNELMODE', channel=self.bot.channel, modes=modes[args[1].lower()], params=args[0])
             else:
                 yield from self.__warning(kwargs, 'nomaster')
         else:
             yield from self.__warning(kwargs, 'unknown')
 
     @asyncio.coroutine
-    def __enable(self):
-        modes = {}
-        pass
+    def __get(self, kwargs):
+        yield from self.__getdrop(kwargs, {
+            'op':"+o",
+            'voice':"+v"
+        })
 
     @asyncio.coroutine
-    def __disable(self):
-        modes = {}
-        pass
+    def __drop(self, kwargs):
+        yield from self.__getdrop(kwargs, {
+            'op':"-o",
+            'voice':"-v"
+        })
+
+    @asyncio.coroutine
+    def __endiable(self, kwargs, modes):
+        self.log.debug('{}, {}'.format(kwargs.argument, modes))
+        if bool(kwargs.argument):
+            if kwargs.host == self.bot.master:
+                self.send('CHANNELMODE', channel=self.bot.channel, modes=modes[kwargs.argument.lower()])
+            else:
+                yield from self.__warning(kwargs, 'nomaster')
+        else:
+            yield from self.__warning(kwargs, 'unknown')
+
+    @asyncio.coroutine
+    def __enable(self, kwargs):
+        yield from self.__endiable(kwargs, {
+            'color':'-c'
+        })
+
+    @asyncio.coroutine
+    def __disable(self, kwargs):
+        yield from self.__endiable(kwargs, {
+            'color':'+c'
+        })
 
     @asyncio.coroutine
     def __warning(self, kwargs, warning):

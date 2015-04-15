@@ -21,6 +21,10 @@ class module(object):
         pass
 
     @coroutine
+    def ping(self, kwargs):
+        pass
+
+    @coroutine
     def privmsg(self, kwargs):
         pass
 
