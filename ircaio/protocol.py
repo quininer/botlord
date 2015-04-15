@@ -1,10 +1,17 @@
 from asyncio import Protocol, async, wait
+
 from .pack import pack_command
 from .unpack import unpack_command
 from .attrdict import AttrDict
 from functools import partial
 
+from os import listdir
+from os.path import splitext, isfile, join
+from importlib import import_module
+
 class IRCProtocol(Protocol):
+    modules = []
+
     def __init__(self, config:dict, loop, event, log):
         '''
         >>> from events import events
@@ -120,3 +127,12 @@ class IRCProtocol(Protocol):
 
     def eof_received(self):
         self.transport.close()
+
+
+    def load_modules(self):
+        self.modules = [
+            import_module('modules.{}'.format(module_name)).main(self) for module_name in (
+                splitext(x)[0] for x in listdir('./modules')
+                if (isfile(join('modules', x)) and (not x in ['__init__.py', 'module.py'] and (not x.startswith('.'))))
+            )
+        ]

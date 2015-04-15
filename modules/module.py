@@ -1,6 +1,8 @@
 class module(object):
-    def __init__(self):
-        pass
+    def __init__(self, bot):
+        self.bot = bot
+        self.send = bot.send
+        self.log = bot.log
 
     def made(self):
         pass
@@ -11,63 +13,63 @@ class module(object):
     def data(self):
         pass
 
-    def privmsg(self):
+    def privmsg(self, kwargs):
         pass
 
-    def notice(self):
+    def notice(self, kwargs):
         pass
 
-    def command(self):
+    def command(self, kwargs):
         '''
         /msg #linux-cn :botlord: <command>
         /msg botlord :<command>
         '''
         pass
 
-    def join(self):
+    def join(self, kwargs):
         pass
 
-    def part(self):
+    def part(self, kwargs):
         pass
 
-    def quit(self):
+    def quit(self, kwargs):
         pass
 
-    def prl_welcome(self):
+    def rpl_welcome(self, kwargs):
         pass
 
-    def prl_yourhost(self):
+    def rpl_yourhost(self, kwargs):
         pass
 
-    def prl_created(self):
+    def rpl_created(self, kwargs):
         pass
 
-    def prl_myinfo(self):
+    def rpl_myinfo(self, kwargs):
         pass
 
-    def prl_bounce(self):
+    def rpl_bounce(self, kwargs):
         pass
 
-    def prl_motdstart(self):
+    def rpl_motdstart(self, kwargs):
         pass
 
-    def prl_motd(self):
+    def rpl_motd(self, kwargs):
         pass
 
-    def prl_endofmotd(self):
+    def rpl_endofmotd(self, kwargs):
         pass
 
-    def prl_luserclitent(self):
+    def rpl_luserclitent(self, kwargs):
         pass
 
-    def prl_luserme(self):
+    def rpl_luserme(self, kwargs):
         pass
 
-    def prl_luserop(self):
+    def rpl_luserop(self, kwargs):
         pass
 
-    def prl_luserunknown(self):
+    def rpl_luserunknown(self, kwargs):
         pass
 
-    def prl_luserchannels(self):
+    def rpl_luserchannels(self, kwargs):
         pass

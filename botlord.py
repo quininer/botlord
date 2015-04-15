@@ -18,12 +18,12 @@ def main(config, logpath=None):
     log.addHandler(handler)
 
     loop = asyncio.get_event_loop()
-    coro = loop.create_connection(
+    bot = loop.create_connection(
         (lambda: IRCProtocol(config, loop, e, log)),
         **config['server']
     )
 
-    loop.run_until_complete(coro)
+    loop.run_until_complete(bot)
     loop.run_forever()
     loop.close()
 

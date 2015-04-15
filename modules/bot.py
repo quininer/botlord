@@ -1,33 +1,44 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+import asyncio
 from .module import module
 
 class main(module):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.commands = {
-            'quit':self.__quit
+            'quit':self.__quit,
+            'reload':self.__reload
         }
 
-    def made(self, bot):
-        bot.send('NICK', nick=bot.nick)
-        if bool(bot.password):
-            bot.send('PASS', password=bot.password)
-        if bool(bot.realname):
-            bot.send('USER', nick=bot.nick, realname=bot.realname)
-        if bool(bot.channel):
-            bot.send('JOIN', channel=bot.channel)
+    @asyncio.coroutine
+    def made(self):
+        self.send('NICK', nick=self.bot.nick)
+        if bool(self.bot.password):
+            self.send('PASS', password=self.bot.password)
+        if bool(self.bot.realname):
+            self.send('USER', user=self.bot.nick, realname=self.bot.realname)
+        if bool(self.bot.channel):
+            self.send('JOIN', channel=self.bot.channel)
         else:
-            bot.log.warning('channel is not set.')
+            self.log.warning('channel is not set.')
 
-    def ping(self, bot, kwargs):
-        bot.send('PONG', message=kwargs.message)
+    @asyncio.coroutine
+    def ping(self, kwargs):
+        self.send('PONG', message=kwargs.message)
 
-    def command(self, bot, kwargs):
+    @asyncio.coroutine
+    def command(self, kwargs):
         message = kwargs.message.split(' ', 1)
         [cmd, args] = message if len(message) > 1 else message.append(None)
-        self.commands[cmd](bot, kwargs, args)
+        yield from self.commands[cmd](self, args, kwargs)
 
-    def __quit(self, bot, kwargs, args):
-        if kwargs.host == bot.master:
-            bot.send('QUIT', message=args)
+    @asyncio.coroutine
+    def __quit(self, args, kwargs):
+        if kwargs.host == self.bot.master:
+            self.send('QUIT', message=args)
+
+    @asyncio.coroutine
+    def __reload(self, args, kwargs):
+        pass
