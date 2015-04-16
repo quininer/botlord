@@ -1,5 +1,5 @@
 from functools import partial
-from asyncio import coroutine, iscoroutine, wait
+from asyncio import coroutine, iscoroutinefunction, wait
 from attrdict import AttrDict
 
 class Events(object):
@@ -22,7 +22,9 @@ class Events(object):
         ...        bot.send('PRIVMSG', target=kwargs.target, message='{}: {}'.format(kwargs.nick, kwargs.message))
         '''
         def hook(fn):
-            self.__add_event__(event, fn if iscoroutine(fn) else coroutine(fn))
+            if not iscoroutinefunction(fn):
+                fn = coroutine(fn)
+            self.__add_event__(event, fn)
             return fn
         return hook
 

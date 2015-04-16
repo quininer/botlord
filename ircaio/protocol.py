@@ -90,7 +90,7 @@ class IRCProtocol(Protocol):
         >>> event = Events()
         >>> @event.on('MADE')
         ... @coroutine
-        ... def made(bot):
+        ... def made(bot, kwargs):
         ...     bot.send('NICK', nick=bot.nick)
         >>> made in event.__events__['MADE']
         True
@@ -105,9 +105,9 @@ class IRCProtocol(Protocol):
         >>> from events import Events
         >>> event = Events()
         >>> @event.on('MADE')
-        ... def made(bot):
+        ... def made(bot, kwargs):
         ...     bot.write("Hello world.")
-        >>> iscoroutine(made)
+        >>> iscoroutine(made())
         True
         '''
         self.log.info('[senddata] {}'.format(data))
@@ -120,9 +120,10 @@ class IRCProtocol(Protocol):
         >>> from events import Events
         >>> event = Events()
         >>> @event.on('MADE')
-        ... def made(bot):
+        ... def made(bot, kwargs):
         ...     bot.send('PRIVMSG', target=nick, message=message)
-        >>> iscoroutine(made)
+        >>> iscoroutine(made())
+        True
         '''
         try:
             self.write(pack_command(command, **kwargs))
@@ -138,7 +139,7 @@ class IRCProtocol(Protocol):
         >>> @event.on('DATA')
         ... def data(bot, kwargs):
         ...     bot.log.debug(kwargs.message)
-        >>> iscoroutine(data)
+        >>> iscoroutine(data())
         True
         '''
         data = data.decode('utf-8')
@@ -154,9 +155,9 @@ class IRCProtocol(Protocol):
         >>> from events import Events
         >>> event = Events()
         >>> @event.on('LOST')
-        ... def lost(bot):
+        ... def lost(bot, kwargs):
         ...     bot.log.info('bye~')
-        >>> iscoroutine(lost)
+        >>> iscoroutine(lost())
         True
         '''
         self.loop.stop()
