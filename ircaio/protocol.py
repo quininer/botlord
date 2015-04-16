@@ -1,8 +1,8 @@
 from asyncio import Protocol, async, wait
 
-from .pack import pack_command
-from .unpack import unpack_command
-from .attrdict import AttrDict
+from pack import pack_command
+from unpack import unpack_command
+from attrdict import AttrDict
 from functools import partial
 
 from os import listdir
@@ -14,13 +14,19 @@ class IRCProtocol(Protocol):
 
     def __init__(self, config:dict, loop, event, log):
         '''
-        >>> from events import events
-        >>> log = logging.getLogger(__name__)
+        >>> import logging, asyncio
+        >>> from events import Events
+        >>> event = Events()
+        >>> @event.on('MADE')
+        ... def made(bot, kwargs):
+        ...     bot.log.info('test.')
+        ...     bot.send('QUIT', message="test.")
+        >>> log = logging.getLogger('test.log')
         >>> loop = asyncio.get_event_loop()
         >>> coro = loop.create_connection(
         ...     (lambda: IRCProtocol({
-        ...         'nick':"botlord",
-        ...         'channel':"#linux-cn"
+        ...         'nick':"testbot",
+        ...         'channel':"#testbot"
         ...     }, loop, event, log)),
         ...     **{
         ...         'host':"irc.freenode.net",
@@ -28,7 +34,10 @@ class IRCProtocol(Protocol):
         ...         'ssl':True
         ...     }
         ... )
-        >>> loop.run_until_complete(coro)
+        >>> asyncio.iscoroutine(coro)
+        True
+        >>> type(loop.run_until_complete(coro))
+        <class 'tuple'>
         >>> loop.run_forever()
         '''
         self.nick = config['nick']
@@ -56,7 +65,7 @@ class IRCProtocol(Protocol):
                 self.log.debug('{}: {!r}'.format(command, kwargs))
                 args[command] = kwargs
             except ValueError as err:
-                self.log.error(err)
+                self.log.warning(err)
 
         self.__event_handle__(args)
 
@@ -76,9 +85,15 @@ class IRCProtocol(Protocol):
     def connection_made(self, transport):
         '''
         connection made event.
+        >>> from asyncio import coroutine
+        >>> from events import Events
+        >>> event = Events()
         >>> @event.on('MADE')
-        ... def made(bot)
+        ... @coroutine
+        ... def made(bot):
         ...     bot.send('NICK', nick=bot.nick)
+        >>> made in event.__events__['MADE']
+        True
         '''
         self.transport = transport
         self.log.info('Connection made.')
@@ -86,7 +101,14 @@ class IRCProtocol(Protocol):
 
     def write(self, data:str):
         '''
-        >>> bot.write("Hello world.")
+        >>> from asyncio import iscoroutine
+        >>> from events import Events
+        >>> event = Events()
+        >>> @event.on('MADE')
+        ... def made(bot):
+        ...     bot.write("Hello world.")
+        >>> iscoroutine(made)
+        True
         '''
         self.log.info('[senddata] {}'.format(data))
         data = '{}\r\n'.format(data).encode()
@@ -94,19 +116,30 @@ class IRCProtocol(Protocol):
 
     def send(self, command, **kwargs):
         '''
-        >>> bot.send('PRIVMSG', target=nick, message=message)
+        >>> from asyncio import iscoroutine
+        >>> from events import Events
+        >>> event = Events()
+        >>> @event.on('MADE')
+        ... def made(bot):
+        ...     bot.send('PRIVMSG', target=nick, message=message)
+        >>> iscoroutine(made)
         '''
         try:
             self.write(pack_command(command, **kwargs))
         except ValueError as err:
-            self.log.error(err)
+            self.log.warning(err)
 
     def data_received(self, data:bytes):
         '''
         data received event.
+        >>> from asyncio import iscoroutine
+        >>> from events import Events
+        >>> event = Events()
         >>> @event.on('DATA')
         ... def data(bot, kwargs):
         ...     bot.log.debug(kwargs.message)
+        >>> iscoroutine(data)
+        True
         '''
         data = data.decode('utf-8')
         self.log.info('[received] {}'.format(data))
@@ -117,9 +150,14 @@ class IRCProtocol(Protocol):
     def connection_lost(self, exc):
         '''
         connection lost event.
+        >>> from asyncio import iscoroutine
+        >>> from events import Events
+        >>> event = Events()
         >>> @event.on('LOST')
         ... def lost(bot):
         ...     bot.log.info('bye~')
+        >>> iscoroutine(lost)
+        True
         '''
         self.loop.stop()
         self.log.info('Connection lost.')
