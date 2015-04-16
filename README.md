@@ -12,6 +12,7 @@ Inspiration comes from [bottom](https://github.com/numberoverzero/bottom).
 有效赞成票超过 70% 则模块设计通过并将实现。
 
 模块设计内容包括且不限于:
-    * 防灌水
-    * 无聊时的笑话
-    * 基本纠错
+
+* 防灌水
+* 无聊时的笑话
+* 基本纠错
