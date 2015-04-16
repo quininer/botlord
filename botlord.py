@@ -11,7 +11,7 @@ from handle import e
 
 def main(config, logpath=None):
     log = getLogger(config['nick'])
-    log.setLevel('DEBUG' if config['debug'] else 'INFO')
+    log.setLevel('DEBUG' if 'debug' in config and config['debug'] else 'INFO')
     handler = handlers.RotatingFileHandler(
         filename=(logpath or '{}.log'.format(config['nick']))
     )
