@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import asyncio
-from module import module
+from .module import module
 
 class main(module):
     def __init__(self, *args, **kwargs):

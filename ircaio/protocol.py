@@ -57,15 +57,13 @@ class IRCProtocol(Protocol):
         args = {
             event: {'message':message}
         }
-        self.log.debug('{}: {!r}'.format(event, message))
 
         if event == 'DATA' and bool(message):
             try:
                 (command, kwargs) = unpack_command(message)
-                self.log.debug('{}: {!r}'.format(command, kwargs))
                 args[command] = kwargs
             except ValueError as err:
-                self.log.warning(err)
+                self.log.warning("[unpack] {}".format(err))
 
         self.__event_handle__(args)
 
@@ -76,7 +74,7 @@ class IRCProtocol(Protocol):
                 continue
             fns += [partial(e, self)(AttrDict(args[event])) for e in self.event.__events__[event]]
 
-            self.log.debug('{}: {!r}'.format(self.event.__events__[event], args[event]))
+            self.log.debug("[handle] {}: {!r}".format(self.event.__events__[event], args[event]))
 
 #       NOTE asyncio task
         if bool(fns):
@@ -128,7 +126,7 @@ class IRCProtocol(Protocol):
         try:
             self.write(pack_command(command, **kwargs))
         except ValueError as err:
-            self.log.warning(err)
+            self.log.warning("[pack] {}".format(err))
 
     def data_received(self, data:bytes):
         '''
@@ -175,4 +173,4 @@ class IRCProtocol(Protocol):
                 if (isfile(join('modules', x)) and (not x in ['__init__.py', 'module.py'] and (not x.startswith('.'))))
             )
         ]
-        self.log.debug(self.modules)
+        self.log.debug("[load modules] {}".format(self.modules))

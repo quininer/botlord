@@ -42,7 +42,7 @@ class Events(object):
             return
         fns = [partial(fn, protocol)(AttrDict(kwargs)) for fn in self.__events__[event]]
 
-        protocol.log.info('trigger', self.__events__[event], kwargs)
+        protocol.log.info("[trigger] {} {}".format(self.__events__[event], kwargs))
 
         if bool(fns):
             yield from wait(fns)
