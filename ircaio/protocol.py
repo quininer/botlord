@@ -1,8 +1,8 @@
 from asyncio import Protocol, async, wait
 
-from pack import pack_command
-from unpack import unpack_command
-from attrdict import AttrDict
+from .pack import pack_command
+from .unpack import unpack_command
+from .attrdict import AttrDict
 from functools import partial
 
 from os import listdir

@@ -1,6 +1,6 @@
 from functools import partial
 from asyncio import coroutine, iscoroutinefunction, wait
-from attrdict import AttrDict
+from .attrdict import AttrDict
 
 class Events(object):
 
