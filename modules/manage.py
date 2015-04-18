@@ -18,9 +18,11 @@ class main(module):
 
     @asyncio.coroutine
     def join(self, kwargs):
-        if kwargs.message.argument == 'start' or kwargs.nick == self.bot.nick:
+        if kwargs.argument == 'start' or kwargs.nick == self.bot.nick:
             self.start = True
             self.send('PRIVMSG', target=self.bot.master.split('/')[-1], message="patrol status {}".format(self.start))
+        elif kwargs.argument == 'stop':
+            self.start = False
 
     @asyncio.coroutine
     def privmsg(self, kwargs):
