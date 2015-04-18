@@ -36,15 +36,15 @@ class main(module):
     @asyncio.coroutine
     def __get(self, kwargs):
         yield from self.__getdrop(kwargs, {
-            'op':"+o",
-            'voice':"+v"
+#            'op':"+o",
+#            'voice':"+v"
         })
 
     @asyncio.coroutine
     def __drop(self, kwargs):
         yield from self.__getdrop(kwargs, {
-            'op':"-o",
-            'voice':"-v"
+#            'op':"-o",
+#            'voice':"-v"
         })
 
     @asyncio.coroutine
