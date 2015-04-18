@@ -18,10 +18,10 @@ class main(module):
 
     @asyncio.coroutine
     def join(self, kwargs):
-        if kwargs.nick == self.bot.nick or kwargs.argument == 'start':
+        if kwargs.nick == self.bot.nick or 'argument' in kwargs and kwargs.argument == 'start':
             self.start = True
             self.send('PRIVMSG', target=self.bot.master.split('/')[-1], message="patrol status {}".format(self.start))
-        elif kwargs.argument == 'stop':
+        elif 'argument' in kwargs and kwargs.argument == 'stop':
             self.start = False
 
     @asyncio.coroutine
@@ -34,7 +34,10 @@ class main(module):
             if not kwargs.host in self.messages:
                 self.messages[kwargs.host] = {
                     'msg':[],
-                    'black':0
+                    'black':{
+                        'l':0,
+                        'q':False
+                    }
                 }
                 tt = 0.0
             else:
@@ -59,16 +62,19 @@ class main(module):
         self.log.debug("[manage] patrol {}".format(self.lock.locked()))
         with (yield from self.lock):
             black = self.messages[kwargs.host]['black']
-            msgtdoas = [i['tdoa'] for i in self.messages[kwargs.host]['msg'][black:]]
+            msgtdoas = [i['tdoa'] for i in self.messages[kwargs.host]['msg'][black['l']:]]
         self.log.debug("[manage] patrol- {}".format(self.lock.locked()))
         length = len(msgtdoas)
         self.log.debug("[manage] {}: {}, {}, {!r}".format(kwargs.host, black, length, msgtdoas))
-        if bool(length) and  sum(msgtdoas)/length < (black+1)*10:
-            self.messages[kwargs.host]['black'] += 1
+        if bool(length) and not black['q'] and  sum(msgtdoas)/length < (black['l']+1)*7:
+            self.log.debug("[manage] {} Violation!".format(kwargs.nick))
+            self.messages[kwargs.host]['black']['q'] = True
+            self.messages[kwargs.host]['black']['l'] += 1
             self.send('CHANNELMODE', channel=self.bot.channel, modes='+q', params=kwargs.nick)#    禁言
-            s = (self.messages[kwargs.host]['black']+1)*30
+            s = (self.messages[kwargs.host]['black']['l']+1)*60
             self.send('PRIVMSG', target=kwargs.nick, message="Triggered a flood control rules, you will be banned for {} seconds.".format(s))
             yield from asyncio.sleep(s)
             self.send('CHANNELMODE', channel=self.bot.channel, modes='-q', params=kwargs.nick)#    解禁
+            self.messages[kwargs.host]['black']['q'] = False
             yield from asyncio.sleep(10*60)
-            self.messages[kwargs.host]['black'] -= 1
+            self.messages[kwargs.host]['black']['l'] -= 1
