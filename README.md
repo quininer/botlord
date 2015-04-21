@@ -16,3 +16,11 @@ Inspiration comes from [bottom](https://github.com/numberoverzero/bottom).
 * 防灌水
 * 无聊时的笑话
 * 基本纠错
+
+----------------------
+
+TODO:
+
+* 更合理的模块管理
+* 使用一个数据库
+* 使用`asyncio.log`
